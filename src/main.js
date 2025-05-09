@@ -1,10 +1,8 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-
 const canvas = document.querySelector("#app");
 let width = (canvas.width = window.innerWidth);
 let height = (canvas.height = window.innerHeight);
+let current = 0;
+let delta = 0;
 
 const ctx = canvas.getContext("2d");
 
@@ -29,16 +27,18 @@ const draw = () => {
 
   ctx.fillStyle = square.color;
   ctx.fillRect(square.position.x, square.position.y, square.scale.x, square.scale.y);
-
-  requestAnimationFrame(draw);
 }
 
 let velocity = {
-  x: 5,
-  y: 5
+  x: 100,
+  y: 0
 };
 
-const move = () => {
+const move = (deltaTime) => {
+  const deltaMod = deltaTime / 1000;
+  /*
+   * 1000px moving 10px p second, should take 100 seconds
+   */
 
   // Handle bounces
   if((velocity.x + square.position.x + square.scale.x) > canvas.width) {
@@ -57,16 +57,17 @@ const move = () => {
     velocity.y = velocity.y * -1;
   }
 
-  square.position.x += velocity.x;
-  square.position.y += velocity.y;
-
-  console.log(velocity);
+  square.position.x += (velocity.x * deltaMod);
+  square.position.y += (velocity.y * deltaMod);
 }
 
-const gameLoop = () => {
-  move();
+const gameLoop = (time) => {
+  delta = time - current;
+  console.log(time, current, delta);
+  current = time;
+  move(delta);
   draw();
   requestAnimationFrame(gameLoop);
 };
 
-gameLoop();
+requestAnimationFrame(gameLoop);
